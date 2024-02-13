@@ -37,85 +37,85 @@ jobs:
           no-fail-on-empty-changeset: "1"
           capabilities: "CAPABILITY_IAM,CAPABILITY_NAMED_IAM"
 
-      #- uses: hashicorp/setup-terraform@v2
-      #  #with:
-      #  #  terraform_wrapper: false
-#
-      #- name: Terraform Format
-      #  id: fmt
-      #  run: terraform fmt -check
-#
-      #- name: Terraform Init
-      #  id: init
-      #  run: |
-      #    terraform init \
-      #      -backend-config="bucket=${{ steps.terraform-s3-backend.outputs.StateBucketName }}" \
-      #      -backend-config="dynamodb_table=${{ steps.terraform-s3-backend.outputs.LockTableName }}" \
-      #      -backend-config="encrypt=true" \
-      #      -backend-config="kms_key_id=${{ steps.terraform-s3-backend.outputs.KmsKeyId }}" \
-      #      -backend-config="region=${{ steps.terraform-s3-backend.outputs.Region }}" \
-      #      -backend-config="role_arn=${{ steps.terraform-s3-backend.outputs.RoleArn }}"
-      #
-      #- name: Terraform Validate
-      #  id: validate
-      #  run: terraform validate -no-color
-#
-      #- name: Terraform Plan
-      #  id: plan
-      #  #if: github.event_name == 'pull_request'
-      #  env:
-      #    TF_VAR_aws_region: ${{ vars.AWS_REGION }}
-      #    TF_VAR_ct_management_account_id: ${{ secrets.CT_MANAGEMENT_ACCOUNT_ID }}
-      #    TF_VAR_log_archive_account_id: ${{ secrets.LOG_ARCHIVE_ACCOUNT_ID }}
-      #    TF_VAR_audit_account_id: ${{ secrets.AUDIT_ACCOUNT_ID }}
-      #    TF_VAR_aft_management_account_id: ${{ secrets.AFT_MANAGEMENT_ACCOUNT_ID }}
-      #    TF_VAR_github_username: ${{ github.actor }}
-      #  continue-on-error: true
-      #
-      #- uses: actions/github-script@v6
-      #  if: github.event_name == 'pull_request'
-      #  env:
-      #    PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
-      #  with:
-      #    github-token: ${{ secrets.GITHUB_TOKEN }}
-      #    script: |
-      #      const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-      #      #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-      #      #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
-      #      #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-#
-      #      <details><summary>Show Plan</summary>
-#
-      #      \`\`\`\n
-      #      ${process.env.PLAN}
-      #      \`\`\`
-#
-      #      </details>
-#
-      #      *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
-#
-      #      github.rest.issues.createComment({
-      #        issue_number: context.issue.number,
-      #        owner: context.repo.owner,
-      #        repo: context.repo.repo,
-      #        body: output
-      #      })
-#
-#
-      #- name: Terraform Plan Status
-      #  if: steps.plan.outcome == 'failure'
-      #  run: exit 1
-#
-      #- name: Terraform Apply
-      #  env:
-      #    TF_VAR_aws_region: ${{ vars.AWS_REGION }}
-      #    TF_VAR_ct_management_account_id: ${{ secrets.CT_MANAGEMENT_ACCOUNT_ID }}
-      #    TF_VAR_log_archive_account_id: ${{ secrets.LOG_ARCHIVE_ACCOUNT_ID }}
-      #    TF_VAR_audit_account_id: ${{ secrets.AUDIT_ACCOUNT_ID }}
-      #    TF_VAR_aft_management_account_id: ${{ secrets.AFT_MANAGEMENT_ACCOUNT_ID }}
-      #    TF_VAR_github_username: ${{ github.actor }}
-      #  if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      #  run: terraform apply -auto-approve -input=false
+      - uses: hashicorp/setup-terraform@v2
+        #with:
+        #  terraform_wrapper: false
+
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform Init
+        id: init
+        run: |
+          terraform init \
+            -backend-config="bucket=${{ steps.terraform-s3-backend.outputs.StateBucketName }}" \
+            -backend-config="dynamodb_table=${{ steps.terraform-s3-backend.outputs.LockTableName }}" \
+            -backend-config="encrypt=true" \
+            -backend-config="kms_key_id=${{ steps.terraform-s3-backend.outputs.KmsKeyId }}" \
+            -backend-config="region=${{ steps.terraform-s3-backend.outputs.Region }}" \
+            -backend-config="role_arn=${{ steps.terraform-s3-backend.outputs.RoleArn }}"
+      
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        #if: github.event_name == 'pull_request'
+        env:
+          TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+          TF_VAR_ct_management_account_id: ${{ secrets.CT_MANAGEMENT_ACCOUNT_ID }}
+          TF_VAR_log_archive_account_id: ${{ secrets.LOG_ARCHIVE_ACCOUNT_ID }}
+          TF_VAR_audit_account_id: ${{ secrets.AUDIT_ACCOUNT_ID }}
+          TF_VAR_aft_management_account_id: ${{ secrets.AFT_MANAGEMENT_ACCOUNT_ID }}
+          TF_VAR_github_username: ${{ github.actor }}
+        continue-on-error: true
+      
+      - uses: actions/github-script@v6
+        if: github.event_name == 'pull_request'
+        env:
+          PLAN: "terraform\n${{ steps.plan.outputs.stdout }}"
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const output = `#### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
+            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
+            #### Terraform Validation 🤖\`${{ steps.validate.outcome }}\`
+            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
+
+            <details><summary>Show Plan</summary>
+
+            \`\`\`\n
+            ${process.env.PLAN}
+            \`\`\`
+
+            </details>
+
+            *Pushed by: @${{ github.actor }}, Action: \`${{ github.event_name }}\`*`;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output
+            })
+
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        env:
+          TF_VAR_aws_region: ${{ vars.AWS_REGION }}
+          TF_VAR_ct_management_account_id: ${{ secrets.CT_MANAGEMENT_ACCOUNT_ID }}
+          TF_VAR_log_archive_account_id: ${{ secrets.LOG_ARCHIVE_ACCOUNT_ID }}
+          TF_VAR_audit_account_id: ${{ secrets.AUDIT_ACCOUNT_ID }}
+          TF_VAR_aft_management_account_id: ${{ secrets.AFT_MANAGEMENT_ACCOUNT_ID }}
+          TF_VAR_github_username: ${{ github.actor }}
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
 
       # - name: Terraform Destroy
       #   env:

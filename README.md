@@ -15,3 +15,19 @@ docker run --rm -it -v ${PWD}:/terraform -w=/terraform --user "$(id -u):$(id -g)
 ```
 
 This should not trigger TF changes.# terraform-ct-immersion-day-aft
+
+
+# Errors
+
+## Missing Terraform
+
+If you follow up on Creating Cloud9 instance in management account to run terraform. You might need to install terraform.
+
+
+## Roles missing Permissions
+
+Solution attached to aft-codepipeline-customizations-role, aft-codebuild-customizations-role IAM polcicy arn:aws:iam::aws:policy/AmazonEC2ReadOnlyAccess
+
+```
+Error: creating CodeBuild Project (aft-global-customizations-terraform): operation error CodeBuild: CreateProject, https response error StatusCode: 400, RequestID: ff678a1f-0d83-41e2-a34b-83c5914431b1, InvalidInputException: Not authorized to perform DescribeSecurityGroups
+```
